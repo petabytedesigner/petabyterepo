@@ -74,6 +74,14 @@ a:not(.noline) {
   min-height: 80vh;
 }
 
+.component{
+  visibility: hidden;
+}
+
+#app.loaded .component{
+  visibility: visible;
+}
+
 h3.header {
   margin-bottom: 2.5rem;
 }
@@ -110,14 +118,7 @@ h3.header {
   display: none;
 }
 
-#nav:hover .change-language:hover + .locale-panel,
-#nav-mobile:hover .change-language:hover + .locale-panel,
 .change-language.clicked + .locale-panel{
-  display: block;
-}
-
-#nav:hover .locale-panel:hover,
-#nav-mobile .locale-panel:hover{
   display: block;
 }
 
@@ -178,10 +179,7 @@ h3.header {
 
 select {
   color: var(--fg-color);
-}
-
-select option {
-  color: var(--pri-bg-color);
+  background-color: var(--pri-bg-color);
 }
 
 .language-select {
@@ -198,7 +196,6 @@ select option {
   text-decoration: underline;
   -webkit-appearance: none;
   appearance: none;
-  background-color: transparent;
   padding: 0;
   text-indent: 0.01px;
   text-overflow: "";
@@ -446,6 +443,10 @@ code[class*="language-"], pre[class*="language-"] {
   display: flex;
   align-items: center;
   text-decoration: none;
+}
+
+#download-btn i{
+  color: #fff;
 }
 
 .card-content {

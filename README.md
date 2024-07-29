@@ -38,6 +38,8 @@ Response:
 }
 ```
 
+List of language codes: https://libretranslate.com/languages
+
 ### Auto Detect Language
 
 Request:
@@ -68,7 +70,7 @@ Response:
 }
 ```
 
-### HTML (beta)
+### HTML
 
 Request:
 
@@ -92,6 +94,38 @@ Response:
 ```javascript
 {
     "translatedText": "<p class=\"green\">¡Hola!</p>"
+}
+```
+
+### Alternative Translations
+
+Request:
+
+```javascript
+const res = await fetch("https://libretranslate.com/translate", {
+	method: "POST",
+	body: JSON.stringify({
+		q: "Hello",
+		source: "en",
+		target: "it",
+		format: "text",
+		alternatives: 3
+	}),
+	headers: { "Content-Type": "application/json" }
+});
+
+console.log(await res.json());
+```
+
+Response:
+
+```javascript
+{
+    "alternatives": [
+        "Salve",
+        "Pronto"
+    ],
+    "translatedText": "Ciao"
 }
 ```
 
@@ -128,7 +162,7 @@ run.bat [args]
 
 ## Build and Run
 
-See [CONTIRBUTING.md](./CONTRIBUTING.md) for information on how to build and run the project yourself.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for information on how to build and run the project yourself.
 
 ### CUDA
 
@@ -165,26 +199,28 @@ Arguments passed to the process or set via environment variables are split into 
 
 ### Configuration Parameters
 
-| Argument                    | Description                                                                                                 | Default Parameter    | Env. name                    |
-|-----------------------------|-------------------------------------------------------------------------------------------------------------| -------------------- |------------------------------|
-| --host                      | Set host to bind the server to                                                                              | `127.0.0.1`          | LT_HOST                      |
-| --port                      | Set port to bind the server to                                                                              | `5000`               | LT_PORT                      |
-| --char-limit                | Set character limit                                                                                         | `No limit`               | LT_CHAR_LIMIT                |
-| --req-limit                 | Set maximum number of requests per minute per client (outside of limits set by api keys)                    | `No limit`               | LT_REQ_LIMIT                 |
-| --req-limit-storage         | Storage URI to use for request limit data storage. See [Flask Limiter](https://flask-limiter.readthedocs.io/en/stable/configuration.html) | `memory://` | LT_REQ_LIMIT_STORAGE |
-| --batch-limit               | Set maximum number of texts to translate in a batch request                                                 | `No limit`               | LT_BATCH_LIMIT               |
-| --ga-id                     | Enable Google Analytics on the API client page by providing an ID                                           | `Empty (no tracking)`               | LT_GA_ID                     |
-| --frontend-language-source  | Set frontend default language - source                                                                      | `auto`        | LT_FRONTEND_LANGUAGE_SOURCE  |
-| --frontend-language-target  | Set frontend default language - target                                                                      | `locale` (match site's locale)   | LT_FRONTEND_LANGUAGE_TARGET  |
-| --frontend-timeout          | Set frontend translation timeout                                                                            | `500`         | LT_FRONTEND_TIMEOUT          |
-| --api-keys-db-path          | Use a specific path inside the container for the local database. Can be absolute or relative                | `db/api_keys.db`                      | LT_API_KEYS_DB_PATH          |
-| --api-keys-remote           | Use this remote endpoint to query for valid API keys instead of using the local database                    | `Empty (use local db instead)` | LT_API_KEYS_REMOTE                  |
-| --get-api-key-link          | Show a link in the UI where to direct users to get an API key                                               | `Empty (no link shown on web ui)` | LT_GET_API_KEY_LINK                  |
-| --shared-storage            | Shared storage URI to use for multi-process data sharing (e.g. when using gunicorn)                         | `memory://` | LT_SHARED_STORAGE    |
-| --load-only                 | Set available languages                                                                                     | `Empty (use all from argostranslate)`    | LT_LOAD_ONLY                 |
-| --threads                   | Set number of threads                                                                                       | `4`    | LT_THREADS                 |
-| --metrics-auth-token        | Protect the /metrics endpoint by allowing only clients that have a valid Authorization Bearer token         | `Empty (no auth required)`    | LT_METRICS_AUTH_TOKEN            |
-| --url-prefix                | Add prefix to URL: example.com:5000/url-prefix/                                                             | `/`    | LT_URL_PREFIX            |
+| Argument                   | Description                                                                                                                                                                                                 | Default Parameter                     | Env. name                   |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------- |
+| --host                     | Set host to bind the server to                                                                                                                                                                              | `127.0.0.1`                           | LT_HOST                     |
+| --port                     | Set port to bind the server to                                                                                                                                                                              | `5000`                                | LT_PORT                     |
+| --char-limit               | Set character limit                                                                                                                                                                                         | `No limit`                            | LT_CHAR_LIMIT               |
+| --req-limit                | Set maximum number of requests per minute per client (outside of limits set by api keys)                                                                                                                    | `No limit`                            | LT_REQ_LIMIT                |
+| --req-limit-storage        | Storage URI to use for request limit data storage. See [Flask Limiter](https://flask-limiter.readthedocs.io/en/stable/configuration.html)                                                                   | `memory://`                           | LT_REQ_LIMIT_STORAGE        |
+| --req-time-cost            | Considers a time cost (in seconds) for request limiting purposes. If a request takes 10 seconds and this value is set to 5, the request cost is either 2 or the actual request cost (whichever is greater). | `No time cost`                        | LT_REQ_TIME_COST            |
+| --batch-limit              | Set maximum number of texts to translate in a batch request                                                                                                                                                 | `No limit`                            | LT_BATCH_LIMIT              |
+| --ga-id                    | Enable Google Analytics on the API client page by providing an ID                                                                                                                                           | `Empty (no tracking)`                 | LT_GA_ID                    |
+| --frontend-language-source | Set frontend default language - source                                                                                                                                                                      | `auto`                                | LT_FRONTEND_LANGUAGE_SOURCE |
+| --frontend-language-target | Set frontend default language - target                                                                                                                                                                      | `locale` (match site's locale)        | LT_FRONTEND_LANGUAGE_TARGET |
+| --frontend-timeout         | Set frontend translation timeout                                                                                                                                                                            | `500`                                 | LT_FRONTEND_TIMEOUT         |
+| --api-keys-db-path         | Use a specific path inside the container for the local database. Can be absolute or relative                                                                                                                | `db/api_keys.db`                      | LT_API_KEYS_DB_PATH         |
+| --api-keys-remote          | Use this remote endpoint to query for valid API keys instead of using the local database                                                                                                                    | `Empty (use local db instead)`        | LT_API_KEYS_REMOTE          |
+| --get-api-key-link         | Show a link in the UI where to direct users to get an API key                                                                                                                                               | `Empty (no link shown on web ui)`     | LT_GET_API_KEY_LINK         |
+| --shared-storage           | Shared storage URI to use for multi-process data sharing (e.g. when using gunicorn)                                                                                                                         | `memory://`                           | LT_SHARED_STORAGE           |
+| --secondary                | Mark this instance as a secondary instance to avoid conflicts with the primary node in multi-node setups                                                                                                    | `Primary node`                        | LT_SECONDARY                |
+| --load-only                | Set available languages                                                                                                                                                                                     | `Empty (use all from argostranslate)` | LT_LOAD_ONLY                |
+| --threads                  | Set number of threads                                                                                                                                                                                       | `4`                                   | LT_THREADS                  |
+| --metrics-auth-token       | Protect the /metrics endpoint by allowing only clients that have a valid Authorization Bearer token                                                                                                         | `Empty (no auth required)`            | LT_METRICS_AUTH_TOKEN       |
+| --url-prefix               | Add prefix to URL: example.com:5000/url-prefix/                                                                                                                                                             | `/`                                   | LT_URL_PREFIX               |
 
 ### Notes:
 
@@ -225,13 +261,29 @@ You can pass application arguments directly to Gunicorn via:
 gunicorn --bind 0.0.0.0:5000 'wsgi:app(api_keys=True)'
 ```
 
-## Run with Kubernetes
+## Kubernetes Deployment
 
-See ["LibreTranslate: your own translation service on Kubernetes" by JM Robles](https://jmrobles.medium.com/libretranslate-your-own-translation-service-on-kubernetes-b46c3e1af630)
+See [Medium article by JM Robles](https://jmrobles.medium.com/libretranslate-your-own-translation-service-on-kubernetes-b46c3e1af630) and the improved [k8s.yaml](https://github.com/LibreTranslate/LibreTranslate/blob/main/k8s.yaml) by @rasos.
+
+### Helm Chart
+
+Based on @rasos work you can now install LibreTranslate on Kubernetes using Helm.
+
+A Helm chart is now available in the [helm-chart](https://github.com/LibreTranslate/helm-chart/) repository where you can find more details.
+
+You can quickly install LibreTranslate on Kubernetes using Helm with the following command:
+
+```bash
+helm repo add libretranslate https://libretranslate.github.io/helm-chart/
+helm repo update
+helm search repo libretranslate
+
+helm install libretranslate libretranslate/libretranslate --namespace libretranslate --create-namespace
+```
 
 ## Manage API Keys
 
-LibreTranslate supports per-user limit quotas, e.g. you can issue API keys to users so that they can enjoy higher requests limits per minute (if you also set `--req-limit`). By default all users are rate-limited based on `--req-limit`, but passing an optional `api_key` parameter to the REST endpoints allows a user to enjoy higher request limits.
+LibreTranslate supports per-user limit quotas, e.g. you can issue API keys to users so that they can enjoy higher requests limits per minute (if you also set `--req-limit`). By default all users are rate-limited based on `--req-limit`, but passing an optional `api_key` parameter to the REST endpoints allows a user to enjoy higher request limits. You can also specify different character limits that bypass the default `--char-limit` value on a per-key basis.
 
 To use API keys simply start LibreTranslate with the `--api-keys` option. If you modified the API keys database path with the option `--api-keys-db-path`, you must specify the path with the same argument flag when using the `ltmanage keys` command.
 
@@ -241,6 +293,12 @@ To issue a new API key with 120 requests per minute limits:
 
 ```bash
 ltmanage keys add 120
+```
+
+To issue a new API key with 120 requests per minute and a maximum of 5,000 characters per request:
+
+```bash
+ltmanage keys add 120 --char-limit 5000
 ```
 
 If you changed the API keys database path:
@@ -308,6 +366,7 @@ You can use the LibreTranslate API using the following bindings:
 
 - Rust: <https://github.com/DefunctLizard/libretranslate-rs>
 - Node.js: <https://github.com/franciscop/translate>
+- TypeScript: <https://github.com/tderflinger/libretranslate-ts>
 - .Net: <https://github.com/sigaloid/LibreTranslate.Net>
 - Go: <https://github.com/SnakeSel/libretranslate>
 - Python: <https://github.com/argosopentech/LibreTranslate-py>
@@ -317,10 +376,12 @@ You can use the LibreTranslate API using the following bindings:
 - Unix: <https://github.com/argosopentech/LibreTranslate-sh>
 - Shell: <https://github.com/Hayao0819/Hayao-Tools/tree/master/libretranslate-sh>
 - Java: <https://github.com/suuft/libretranslate-java>
+- Ruby: <https://github.com/noesya/libretranslate>
+- R: <https://github.com/myanesp/libretranslateR>
 
 ## Discourse Plugin
 
-You can use this [discourse translator plugin](https://github.com/LibreTranslate/discourse-translator) to translate [Discourse](https://discourse.org) topics. To install it simply modify `/var/discourse/containers/app.yml`:
+You can use the [official discourse translator plugin](https://github.com/discourse/discourse-translator) to translate [Discourse](https://discourse.org) topics with LibreTranslate. To install it simply modify `/var/discourse/containers/app.yml`:
 
 ```yaml
 ## Plugins go here
@@ -331,11 +392,13 @@ hooks:
         cd: $home/plugins
         cmd:
           - git clone https://github.com/discourse/docker_manager.git
-          - git clone https://github.com/LibreTranslate/discourse-translator
+          - git clone https://github.com/discourse/discourse-translator
     ...
 ```
 
 Then issue `./launcher rebuild app`. From the Discourse's admin panel then select "LibreTranslate" as a translation provider and set the relevant endpoint configurations.
+
+See it in action on this [page](https://community.libretranslate.com/t/have-you-considered-adding-the-libretranslate-discourse-translator-multilingual-to-this-forum/766).
 
 ## Mobile Apps
 
@@ -354,11 +417,9 @@ This is a list of public LibreTranslate instances, some require an API key. If y
 URL |API Key Required | Links
 --- | --- | ---
 [libretranslate.com](https://libretranslate.com)|:heavy_check_mark:|[ [Get API Key](https://portal.libretranslate.com) ] [ [Service Status](https://status.libretranslate.com/) ]
-[translate.argosopentech.com](https://translate.argosopentech.com/)|-
-[translate.foxhaven.cyou](https://translate.foxhaven.cyou/)|-
 [translate.terraprint.co](https://translate.terraprint.co/)|-
 [trans.zillyhuhn.com](https://trans.zillyhuhn.com/)|-
-[lt.psf.lt](https://lt.psf.lt/)|-
+[translate.lotigara.ru](https://translate.lotigara.ru)|-
 
 ## TOR/i2p Mirrors
 
@@ -399,7 +460,7 @@ Arabic |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/ar/)
 Azerbaijani |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/az/)
 Chinese |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/zh/)
 Chinese (Traditional) |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/zh_Hant/)
-Czech |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/cs/)
+Czech | :heavy_check_mark: | [Edit](https://hosted.weblate.org/translate/libretranslate/app/cs/)
 Danish |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/da/)
 Dutch |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/nl/)
 English | :heavy_check_mark: | [Edit](https://hosted.weblate.org/projects/libretranslate/app/)
@@ -426,24 +487,31 @@ Slovak |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/sk/)
 Spanish | :heavy_check_mark: | [Edit](https://hosted.weblate.org/translate/libretranslate/app/es/)
 Swedish |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/sv/)
 Turkish |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/tr/)
-Ukranian |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/uk/)
+Ukranian | :heavy_check_mark: | [Edit](https://hosted.weblate.org/translate/libretranslate/app/uk/)
 Vietnamese |  | [Edit](https://hosted.weblate.org/translate/libretranslate/app/vi/)
 
 ## Roadmap
 
 Help us by opening a pull request!
 
-- [x] A docker image (thanks [@vemonet](https://github.com/vemonet) !)
-- [x] Auto-detect input language (thanks [@vemonet](https://github.com/vemonet) !)
-- [X] User authentication / tokens
 - [ ] Language bindings for every computer language
 - [ ] [Improved translations](https://community.libretranslate.com/t/the-best-way-to-train-models/172)
+
+Any other idea is welcome also.
 
 ## FAQ
 
 ### Can I use your API server at libretranslate.com for my application in production?
 
-In short, no. [You need to buy an API key](https://portal.libretranslate.com). You can always run LibreTranslate for free on your own server of course.
+In short, yes, [but only if you buy an API key](https://portal.libretranslate.com). You can always run LibreTranslate for free on your own server of course.
+
+### Some translations on libretranslate.com are different than the self-hosted ones. Why?
+
+By default language models are loaded from the [argos-index](https://github.com/argosopentech/argospm-index). Sometimes we deploy models on libretranslate.com that haven't been added to the argos-index yet, such as those converted from OPUS ([thread](https://community.libretranslate.com/t/opus-mt-language-models-port-thread/757))
+
+### Where are the language models saved?
+
+In `$HOME/.local/share/argos-translate/packages`. On Windows that's `C:\Users\youruser\.local\share\argos-translate\packages`.
 
 ### Can I use LibreTranslate behind a reverse proxy, like Apache2 or Caddy?
 
@@ -605,6 +673,38 @@ Add this to an existing NGINX config or save it as `libretranslate` in the `/etc
 
 </details>
 
+### Can I do batch translations?
+
+Yes, pass an array of strings instead of a string to the `q` field:
+
+```javascript
+const res = await fetch("https://libretranslate.com/translate", {
+  method: "POST",
+  body: JSON.stringify({
+    q: ["Hello", "world"],
+    source: "en",
+    target: "es"
+  }),
+  headers: { "Content-Type": "application/json" }
+});
+
+console.log(await res.json());
+// {
+//     "translatedText": [
+//         "Hola",
+//         "mundo"
+//     ]
+// }
+```
+
+## Contributing
+
+We welcome contributions! Here's some ideas:
+
+* Train a new language model using [Locomotive](https://github.com/LibreTranslate/Locomotive). For example, we want to train improved neural networks for [German](https://community.libretranslate.com/t/help-wanted-improve-en-de-translation/935) and many other languages.
+* Can you beat the performance of our language models? Train a new one and let's compare it. To submit your model make a post on the [community forum](https://community.libretranslate.com/) with a link to download your .argosmodel file and some sample text that your model has translated.
+* Pick an [issue](https://github.com/LibreTranslate/LibreTranslate/issues) to work on.
+
 ## Credits
 
 This work is largely possible thanks to [Argos Translate](https://github.com/argosopentech/argos-translate), which powers the translation engine.
@@ -616,4 +716,3 @@ This work is largely possible thanks to [Argos Translate](https://github.com/arg
 ## Trademark
 
 See [Trademark Guidelines](https://github.com/LibreTranslate/LibreTranslate/blob/main/TRADEMARK.md)
-# petabyterepo
